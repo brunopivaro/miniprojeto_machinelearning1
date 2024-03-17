@@ -46,3 +46,28 @@ def encoding_func(x):
 
 dados['Gender'] = dados['Gender'].map(encoding_func) 
 print(dados.sample(5))
+
+#Verificando valores null e duplicados
+print(dados[dados.isnull().values])
+print(dados[dados.duplicated(keep = False)])
+
+#Removendo duplicatas
+dados = dados.drop_duplicates()
+
+#Tratando os outliers
+print(dados.describe())
+
+sns.boxplot(dados.Alamine_Aminotransferase)
+plt.show()
+
+#Contagem de frequências da variável acima, para identificar se realmente é um outlier
+print(dados.Alamine_Aminotransferase.sort_values(ascending = False).head()) #Não iremos remover, pois senão seriam 117 clientes removidos
+
+#Verificando outra variável
+sns.boxplot(dados.Aspartate_Aminotransferase)
+plt.show()
+#Contagem de frequências
+print(dados.Alamine_Aminotransferase.sort_values(ascending = False).head()) 
+
+dados = dados[dados.Alamine_Aminotransferase <= 2500] #Removendo do dataframe linhas dessa variável que seja maior que 2500
+print(dados.shape)
