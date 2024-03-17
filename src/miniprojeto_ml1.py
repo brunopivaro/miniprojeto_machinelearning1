@@ -3,6 +3,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import imblearn
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
@@ -15,6 +16,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import roc_curve, auc, roc_auc_score, confusion_matrix
 from sklearn.metrics import accuracy_score
+from imblearn.over_sampling import SMOTE
 
 #Importando dados
 dados = pd.read_csv("dataset.csv")
@@ -75,3 +77,36 @@ print(dados.shape)
 #Tratamento de valores ausentes
 print(dados[dados.isnull().values])
 dados = dados.dropna(how = 'any')
+
+#Pré-Processamento dos Dados
+dados = dados.drop(['Direct_Bilirubin'], axis = 1) #Excluindo a variável devido a alta correlação entre ela e a variável Total_Bilirubin
+
+#Divisão em dados de treino e dados de teste
+y = dados.Target #Separando a variável Target
+X = dados.drop(['Target'], axis = 1) #Novo df sem a variável target
+
+#Realizando o split dos dados em treino/teste pegando 25% dos dados
+X_treino, X_teste, Y_treino, Y_teste = train_test_split(X, y, test_size = 0.25, random_state = 1234, stratify = dados.Target)
+
+print(len(X_treino))
+print(len(X_teste))
+
+#Realizando o balanceamento de variável, pois a variável target possui muito mais registros de um do que de outro
+over_sampler = SMOTE(k_neighbors = 2)
+
+#Iremos aplicar o balanceamento apenas nos dados de treino, para evitar que o modelo seja tendencioso
+X_res, Y_res = over_sampler.fit_resample(X_treino, Y_treino)
+
+print(len(X_res))
+print(len(Y_res))
+
+#Substituindo nas variáveis originais
+X_treino = X_res
+Y_treino = Y_res
+
+#Padronização dos dados
+treino_mean = X_treino.mean()
+treino_std = X_treino.std()
+X_treino = (X_treino - treino_mean) / treino_std
+
+print(X_treino.head(10))
