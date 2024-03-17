@@ -71,3 +71,7 @@ print(dados.Alamine_Aminotransferase.sort_values(ascending = False).head())
 
 dados = dados[dados.Alamine_Aminotransferase <= 2500] #Removendo do dataframe linhas dessa variável que seja maior que 2500
 print(dados.shape)
+
+#Tratamento de valores ausentes
+print(dados[dados.isnull().values])
+dados = dados.dropna(how = 'any')
